@@ -149,14 +149,95 @@ Live-`index.html` сайта собран как один файл с inline `<s
 
 ---
 
-## 4–9. (TODO — коммит 3b)
+## 4. Group III — Иконки нод (10 SVG)
 
-В следующем коммите 3b сюда добавляются:
+Общие атрибуты — те же, что в Group II (см. §3): line-art lucide-style, `viewBox="0 0 24 24"`, `stroke="currentColor"`, `stroke-width="1.75"`, round caps, `aria-hidden="true"`, `focusable="false"`. Render-size в CSS — 18×18 (через `.scheme-node__icon svg { width: 18px; height: 18px; }`).
 
-- **§4** — Group III: 10 SVG иконок для нод (factory, store, warehouse, app-window, database, server, wine, paw-print, qr-code, receipt) + a11y-атрибуты + render-size 18×18.
-- **§5** — Schema-First полный HTML snippet (3 колонки + 10 нод + overlay-SVG для connection-lines + финальный CTA + `.reveal-1..5` stagger). 3 нода с `<a href>` (ЕГАИС, Меркурий, Честный знак), 7 нод с `<div>`. Mobile chevron / desktop overlay поведение явно описано.
-- **§6** — Подключения CSS/JS, font-stack, dependency check.
-- **§7** — Архив `_archive/index.v1.frozen.html`, как с ним обращаться.
-- **§8** — JSON-LD на проде: что уже есть (Organization + FAQPage) и почему новой разметки **не добавляем** в Hero. Service[] — в roadmap.
-- **§9** — Roadmap (расширенный): 6 пунктов + 4.5 (WCAG button audit) + 4.6 (`.metrics` defaults + 24/7 removal) + 4.7 (`Service[]` JSON-LD).
-- **§10** — Тестирование (`prefers-reduced-motion`, viewport breakpoints).
+**Кликабельность:** 3 ноды (★) — `<a href>` с `data-event` для tracker'а. 7 нод — `<div>` без href и без `data-event`.
+
+### III.1 — factory (1С:ERP — производство и крупный учёт)
+<!-- ANCHOR: node-1c-erp -->
+
+### III.2 — store (1С:Розница — автоматизация магазинов и касс)
+<!-- ANCHOR: node-1c-roznitsa -->
+
+### III.3 — warehouse (1С:УТ — управление оптовой торговлей)
+<!-- ANCHOR: node-1c-ut -->
+
+### III.4 — app-window (1С Платформа — актуальная версия с лицензиями)
+<!-- ANCHOR: node-1c-platform -->
+
+### III.5 — database (PostgreSQL — БД без затрат на лицензии)
+<!-- ANCHOR: node-postgresql -->
+
+### III.6 — server (Linux-серверы — стабильная инфраструктура 24×7)
+<!-- ANCHOR: node-linux -->
+
+### III.7 — wine (ЕГАИС — продажа алкоголя без блокировки) ★ кликабельная
+<!-- ANCHOR: node-egais -->
+
+### III.8 — paw-print (Меркурий — ветеринарные сертификаты автоматом) ★ кликабельная
+<!-- ANCHOR: node-merkuriy -->
+
+### III.9 — qr-code (Честный знак — маркировка без риска штрафов) ★ кликабельная
+<!-- ANCHOR: node-chestnyy-znak -->
+
+### III.10 — receipt (ФФД 1.2 — кассовые чеки по последнему стандарту)
+<!-- ANCHOR: node-ffd -->
+
+---
+
+## 5. Schema-First — полный HTML snippet
+<!-- ANCHOR: schema-first-html -->
+
+---
+
+## 6. Подключения CSS/JS
+
+**CSS:** `<link rel="stylesheet" href="assets/css/hero.css">` помещается в `<head>` **после** inline `<style>` сайта. Уже добавлено в `site_head.txt:1635`. Это критично — наш `:root { --scheme-glow: ... }` должен подгружаться позже сайтового `:root`, чтобы fallback-цепочка `var(--btn-primary-shadow-color, rgba(255,122,26,0.35))` работала корректно.
+
+**JS:** `<script src="assets/js/hero.js" defer></script>` перед `</body>`. Для proof-bar v2 (статичная цифра) и Schema-First v2 (без count-up) реальной работы не выполняет. Полезен только для делегированного `[data-event]` tracker'а, который автоматически ловит клики на 3 кликабельные ноды (ЕГАИС, Меркурий, Честный знак). Если на проде Метрика/GA4 ещё не подключены — tracker молчит, никаких ошибок.
+
+**Шрифты:** Oswald 400/500/600/700 + Barlow Condensed 300/400/500/600/700 уже подключены в `<head>` сайта. Не дублировать.
+
+## 7. Архив прототипа
+
+`_archive/index.v1.frozen.html` (commit `4021a69`) — старый прототип Turn 1, использовал классы `.hero__*` / `.btn--*` / `.stat-strip*`, которых больше нет в `hero.css` v2. Хранится только как git-history-anchor для будущего разбора версий. **Не использовать** как референс вёрстки или как тестовую страницу — он визуально сломан после rewrite.
+
+## 8. JSON-LD на проде
+
+В live `<head>` уже размещены два узла внутри одного `@graph` (см. `site_head.txt:38–145`):
+
+- **Organization** — ООО «Альфа-Касса», ИНН 6506011939, ОГРН 1186501006394, Сахалинская область, телефон, email, `knowsAbout` (15 терминов: ЕГАИС, Честный знак, ГИС МТ, Меркурий, ФГИС ЛК, ФГИС Зерно, ЭДО, цифровой рубль, МЧД, СБП, 1С, АТОЛ, Frontol, маркировка, 54-ФЗ).
+- **FAQPage** — 8 Question/Answer пар.
+
+**Новой JSON-LD разметки для proof-bar / Schema-First не добавляем.** Schema-First — визуальная диаграмма архитектуры, не семантическая разметка. Подходящий тип для отдельных госсистем (`Service`) — это уровень посадочных страниц `/tsifrovye-sistemy/*`, не главная. Подробнее — §9 Roadmap пункт 4.7.
+
+Перед добавлением ЛЮБОЙ новой JSON-LD разметки — проверять Я.Валидатор микроразметки, чтобы не задублировать существующие узлы.
+
+## 9. Roadmap (расширенный)
+<!-- ANCHOR: roadmap-notes -->
+
+---
+
+## 10. Тестирование
+
+### prefers-reduced-motion
+
+1. Chrome DevTools → `Ctrl+Shift+P` → «Show Rendering».
+2. «Emulate CSS media feature `prefers-reduced-motion`» → `reduce`.
+3. Перезагрузить страницу.
+
+Ожидаемое поведение:
+
+- `.proof-bar` появляется без `slideUp` (мгновенно, opacity 1).
+- `.scheme-col` (3 колонки) — без stagger, появляются мгновенно.
+- Hover-переходы на карточках сайта (`.system-card-featured` и т. п.) **остаются включёнными** — это site DS, наш scope их не отключает (см. CLAUDE.md / a11y-baseline).
+
+### Viewport breakpoints
+
+| Ширина | Поведение |
+|---|---|
+| ≤640 px | proof-bar: цифра + label вертикально (`flex-wrap: wrap`). |
+| ≤1023 px | Schema: 1 колонка, между парами — chevron вниз. Overlay-SVG скрыт (`display: none`). |
+| ≥1024 px | Schema: 3 колонки, chevron'ы скрыты, overlay-SVG виден (декоративные connection-lines). |
