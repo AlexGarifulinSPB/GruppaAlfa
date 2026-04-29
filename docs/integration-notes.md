@@ -156,34 +156,284 @@ Live-`index.html` сайта собран как один файл с inline `<s
 **Кликабельность:** 3 ноды (★) — `<a href>` с `data-event` для tracker'а. 7 нод — `<div>` без href и без `data-event`.
 
 ### III.1 — factory (1С:ERP — производство и крупный учёт)
-<!-- ANCHOR: node-1c-erp -->
+SVG (рисунок: фабричное здание с трубами):
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/>
+  <path d="M17 18h1"/>
+  <path d="M12 18h1"/>
+  <path d="M7 18h1"/>
+</svg>
+```
+
+HTML node (некликабельный):
+
+```html
+<li class="scheme-node">
+  <span class="scheme-node__icon">
+    <!-- SVG III.1 factory сюда -->
+  </span>
+  <span class="scheme-node__body">
+    <span class="scheme-node__term">1С:ERP</span>
+    <span class="scheme-node__benefit">производство и крупный учёт</span>
+  </span>
+</li>
+```
 
 ### III.2 — store (1С:Розница — автоматизация магазинов и касс)
-<!-- ANCHOR: node-1c-roznitsa -->
+SVG (рисунок: магазин с навесом):
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
+  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+  <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/>
+  <path d="M2 7h20"/>
+</svg>
+```
+
+HTML node (некликабельный):
+
+```html
+<li class="scheme-node">
+  <span class="scheme-node__icon">
+    <!-- SVG III.2 store сюда -->
+  </span>
+  <span class="scheme-node__body">
+    <span class="scheme-node__term">1С:Розница</span>
+    <span class="scheme-node__benefit">автоматизация магазинов и касс</span>
+  </span>
+</li>
+```
 
 ### III.3 — warehouse (1С:УТ — управление оптовой торговлей)
-<!-- ANCHOR: node-1c-ut -->
+SVG (рисунок: склад с ящиком внутри):
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/>
+  <rect x="6" y="10" width="12" height="12" rx="1"/>
+  <path d="M6 14h12"/>
+  <path d="M6 18h12"/>
+</svg>
+```
+
+HTML node (некликабельный):
+
+```html
+<li class="scheme-node">
+  <span class="scheme-node__icon">
+    <!-- SVG III.3 warehouse сюда -->
+  </span>
+  <span class="scheme-node__body">
+    <span class="scheme-node__term">1С:УТ</span>
+    <span class="scheme-node__benefit">управление оптовой торговлей</span>
+  </span>
+</li>
+```
 
 ### III.4 — app-window (1С Платформа — актуальная версия с лицензиями)
-<!-- ANCHOR: node-1c-platform -->
+SVG (рисунок: окно приложения с тулбаром):
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <rect x="2" y="4" width="20" height="16" rx="2"/>
+  <path d="M2 8h20"/>
+  <path d="M6 6h.01"/>
+  <path d="M10 6h.01"/>
+  <path d="M14 6h.01"/>
+</svg>
+```
+
+HTML node (некликабельный):
+
+```html
+<li class="scheme-node">
+  <span class="scheme-node__icon">
+    <!-- SVG III.4 app-window сюда -->
+  </span>
+  <span class="scheme-node__body">
+    <span class="scheme-node__term">1С Платформа</span>
+    <span class="scheme-node__benefit">актуальная версия с лицензиями</span>
+  </span>
+</li>
+```
 
 ### III.5 — database (PostgreSQL — БД без затрат на лицензии)
-<!-- ANCHOR: node-postgresql -->
+SVG (рисунок: база данных — цилиндр):
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <ellipse cx="12" cy="5" rx="9" ry="3"/>
+  <path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/>
+  <path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/>
+</svg>
+```
+
+HTML node (некликабельный):
+
+```html
+<li class="scheme-node">
+  <span class="scheme-node__icon">
+    <!-- SVG III.5 database сюда -->
+  </span>
+  <span class="scheme-node__body">
+    <span class="scheme-node__term">PostgreSQL</span>
+    <span class="scheme-node__benefit">база данных без затрат на лицензии</span>
+  </span>
+</li>
+```
 
 ### III.6 — server (Linux-серверы — стабильная инфраструктура 24×7)
-<!-- ANCHOR: node-linux -->
+SVG (рисунок: серверная стойка из 2 слотов):
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <rect x="2" y="2" width="20" height="8" rx="2"/>
+  <rect x="2" y="14" width="20" height="8" rx="2"/>
+  <path d="M6 6h.01"/>
+  <path d="M6 18h.01"/>
+</svg>
+```
+
+HTML node (некликабельный):
+
+```html
+<li class="scheme-node">
+  <span class="scheme-node__icon">
+    <!-- SVG III.6 server сюда -->
+  </span>
+  <span class="scheme-node__body">
+    <span class="scheme-node__term">Linux-серверы</span>
+    <span class="scheme-node__benefit">стабильная инфраструктура 24×7</span>
+  </span>
+</li>
+```
 
 ### III.7 — wine (ЕГАИС — продажа алкоголя без блокировки) ★ кликабельная
-<!-- ANCHOR: node-egais -->
+SVG (рисунок: винный бокал с подставкой):
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M8 22h8"/>
+  <path d="M7 10h10"/>
+  <path d="M12 15v7"/>
+  <path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z"/>
+</svg>
+```
+
+HTML node (★ кликабельная — `<a href>`, `data-event`):
+
+```html
+<li class="scheme-node">
+  <a class="scheme-node__link"
+     href="/tsifrovye-sistemy/egais/"
+     data-event="schema_node_egais">
+    <span class="scheme-node__icon">
+      <!-- SVG III.7 wine сюда -->
+    </span>
+    <span class="scheme-node__body">
+      <span class="scheme-node__term">ЕГАИС</span>
+      <span class="scheme-node__benefit">продажа алкоголя без блокировки</span>
+    </span>
+  </a>
+</li>
+```
+
+> Note: класс `.scheme-node__link` — для будущей возможности отдельных hover-стилей на ссылочной ноде. Если в `hero.css` нет правил для него — просто наследует поведение `.scheme-node` (`display: flex`, `gap: 12px`, etc).
 
 ### III.8 — paw-print (Меркурий — ветеринарные сертификаты автоматом) ★ кликабельная
-<!-- ANCHOR: node-merkuriy -->
+SVG (рисунок: отпечаток лапы — 4 пальца + подушечка):
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <circle cx="11" cy="4" r="2"/>
+  <circle cx="18" cy="8" r="2"/>
+  <circle cx="20" cy="16" r="2"/>
+  <circle cx="4" cy="12" r="2"/>
+  <path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 1 1-7 0V15a5 5 0 0 1 2-5Z"/>
+</svg>
+```
+
+HTML node (★ кликабельная — `<a href>`, `data-event`):
+
+```html
+<li class="scheme-node">
+  <a class="scheme-node__link"
+     href="/tsifrovye-sistemy/merkuriy/"
+     data-event="schema_node_merkuriy">
+    <span class="scheme-node__icon">
+      <!-- SVG III.8 paw-print сюда -->
+    </span>
+    <span class="scheme-node__body">
+      <span class="scheme-node__term">Меркурий</span>
+      <span class="scheme-node__benefit">ветеринарные сертификаты автоматом</span>
+    </span>
+  </a>
+</li>
+```
 
 ### III.9 — qr-code (Честный знак — маркировка без риска штрафов) ★ кликабельная
-<!-- ANCHOR: node-chestnyy-znak -->
+SVG (рисунок: QR-код — три угловых маркера):
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <rect x="3" y="3" width="5" height="5" rx="1"/>
+  <rect x="16" y="3" width="5" height="5" rx="1"/>
+  <rect x="3" y="16" width="5" height="5" rx="1"/>
+  <path d="M21 16h-3a2 2 0 0 0-2 2v3"/>
+  <path d="M21 21v.01"/>
+  <path d="M12 7v3a2 2 0 0 1-2 2H7"/>
+  <path d="M12 16h.01"/>
+  <path d="M16 12h1"/>
+  <path d="M21 12v.01"/>
+  <path d="M12 21v-1"/>
+</svg>
+```
+
+HTML node (★ кликабельная — `<a href>`, `data-event`):
+
+```html
+<li class="scheme-node">
+  <a class="scheme-node__link"
+     href="/tsifrovye-sistemy/chestnyy-znak/"
+     data-event="schema_node_chestnyy_znak">
+    <span class="scheme-node__icon">
+      <!-- SVG III.9 qr-code сюда -->
+    </span>
+    <span class="scheme-node__body">
+      <span class="scheme-node__term">Честный знак</span>
+      <span class="scheme-node__benefit">маркировка без риска штрафов</span>
+    </span>
+  </a>
+</li>
+```
 
 ### III.10 — receipt (ФФД 1.2 — кассовые чеки по последнему стандарту)
-<!-- ANCHOR: node-ffd -->
+SVG (рисунок: чек с зубчатым нижним краем + знак рубля):
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
+  <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
+  <path d="M12 17.5v-11"/>
+</svg>
+```
+
+HTML node (некликабельный — посадочной страницы для ФФД 1.2 нет):
+
+```html
+<li class="scheme-node">
+  <span class="scheme-node__icon">
+    <!-- SVG III.10 receipt сюда -->
+  </span>
+  <span class="scheme-node__body">
+    <span class="scheme-node__term">ФФД 1.2</span>
+    <span class="scheme-node__benefit">кассовые чеки по последнему стандарту</span>
+  </span>
+</li>
+```
 
 ---
 
