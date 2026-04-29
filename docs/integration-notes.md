@@ -1,138 +1,162 @@
-# Integration notes — Hero / Stat-Strip / Schema-First
+# Integration notes — v2 (post-redesign)
 
-Инструкция для верстальщика. Прототип — три файла: `index.html`,
-`assets/css/hero.css`, `assets/js/hero.js`. Все классы используют BEM,
-JS — vanilla, no build-step.
+> Этот документ заменяет v1 (см. git history, commit `b935591`). После жалобы
+> заказчика на «wireframe-вид» Stat-Strip и Schema-First оба блока перерисованы
+> под существующий design system сайта `gruppa-alfa.ru`.
 
-## 1. Что куда вставлять
+## 0. TL;DR
 
-В существующий `index.html` сайта [gruppa-alfa.ru](https://gruppa-alfa.ru)
-**ПОСЛЕ** `<header>`/`<nav>` и **ДО** существующих секций
-`.metrics` / `.systems` / `.faq`:
+| Артефакт | Версия | Статус |
+|---|---|---|
+| `assets/css/hero.css` | v2 | ✅ rewrite в `72acba3` + glow var в `745135c` |
+| `assets/js/hero.js` | v1 | ⚠️ Count-up больше не используется (proof-bar v2 = одна статичная цифра). Файл оставляем — пригодится для будущих секций (`scheme_view` IO, делегированный tracker для CTA). |
+| `_archive/index.v1.frozen.html` | v1 frozen | физически перенесён в `4021a69`. Не использовать как референс. |
+| `docs/integration-notes.md` | v2 | этот файл |
 
-```
-<header>...</header>
-<nav>...</nav>
+**На проде меняется:**
 
-<!-- ↓ вставляем сюда три секции из прототипа ↓ -->
-<section class="hero">…</section>
-<section class="stat-strip">…</section>
-<section class="scheme" id="scheme">…</section>
-<!-- ↑ конец вставки ↑ -->
+1. Удалить ранее вставленный v1 stat-strip (если был размещён до жалобы) — там, где сейчас отрисовывается «0 внедрений / 0 дней до отчёта / 0 покрытия в сутки».
+2. Вставить proof-bar (1-cell, «17 часов») — Group I в этом документе.
+3. Вставить перерисованный Schema-First (3 колонки + 10 нод + декоративные connection-lines) — **полный HTML в коммите 3b** (Group III + сборка).
 
-<section class="metrics">…</section>   <!-- существующее -->
-<section class="systems">…</section>   <!-- существующее -->
-<section class="faq">…</section>       <!-- существующее -->
-```
+**На проде НЕ трогаем:**
 
-Подключения:
-- `<link rel="stylesheet" href="assets/css/hero.css">` — в `<head>`
-  **после** существующего CSS сайта (чтобы наши `:root` дополнения
-  не были перебиты).
-- `<script src="assets/js/hero.js" defer></script>` — перед `</body>`.
-- Google Fonts `<link>` — в `<head>` (см. п. 2).
+- **Hero, в т.ч. H1** — наш scope только proof-bar и Schema-First. Существующий H1 «Подключаем бизнес к обязательным госсистемам РФ — ЕГАИС, Честный знак, Меркурий, цифровой рубль» сохраняется без изменений (4 коммерческих кластера, поисковые позиции — не наша территория).
+- Шрифты (Oswald + Barlow Condensed уже подключены в `<head>`).
+- Кнопки сайта (`.btn` / `.btn-primary` / `.btn-ghost`) — мы их не дублируем и не переопределяем; используем напрямую.
+- Существующие секции `.metrics`, `.services`, `.systems`, `.faq`, `.process`, `.contact`, footer.
+- Существующий JSON-LD блок (`Organization` + `FAQPage`).
 
-> ⚠️ `index.html` в репо — **прототип** для просмотра и тестирования
-> в изоляции, **не** замена production-сайта. На прод копируются
-> только три блока + два ассет-файла.
+---
 
-## 2. Зависимости
+## 1. Анкеры вставки
 
-**Шрифты:** Oswald 500/700 + Barlow Condensed 400/500/600
-(если на сайте уже подключены — пропустить):
+Live-`index.html` сайта собран как один файл с inline `<style>` (≈1635 строк) + inline JSON-LD + body.
+
+| Snippet | Вставить ПОСЛЕ | Вставить ДО |
+|---|---|---|
+| **Group I** — proof-bar | закрывающий `</section>` секции `<section class="hero">` | открывающий `<section class="metrics">` |
+| **Schema-First** (Groups II + III) | закрывающий `</section>` секции `<section class="services">` | открывающий `<section class="systems">` |
+
+> Поместить proof-bar **внутри** `.hero` нельзя — это отдельная узкая полоска (border-top + border-bottom = идиома `.brands`), а не часть Hero-фона. Поместить **между** Hero и `.metrics` — самое место: заменяет «первое впечатление от метрик» уникальной цифрой «17ч», существующий `.metrics` (с 4 другими цифрами) идёт следом.
+
+---
+
+## 2. Group I — Proof-bar (1 ячейка, без JS)
+
+### Insertion anchor
+
 ```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Barlow+Condensed:wght@400;500;600&display=swap">
+<!-- … закрытие </section class="hero"> … -->
+
+<!-- ↓↓ ВСТАВКА: Group I — proof-bar ↓↓ -->
+[snippet ниже]
+<!-- ↑↑ /ВСТАВКА ↑↑ -->
+
+<!-- … <section class="metrics"> … -->
 ```
 
-**CSS-переменные:** существующие токены сайта (`--bg`, `--ink`,
-`--accent`, `--purple-*`) дублируются в `hero.css` для standalone-просмотра
-прототипа. **При интеграции** — удалить из `hero.css :root` всё, что
-уже задано в основном CSS сайта. Оставить только новые токены:
-`--accent-text`, `--accent-hover`, `--accent-active`,
-`--surface-card`, `--surface-elev`, `--border-subtle`,
-`--border-strong`, `--focus-ring`, `--container-max`, `--space-section`.
+### Snippet
 
-**JS-зависимостей нет.** Vanilla JS, zero npm, поддержка ES5+
-(`var`, `function expression`, `Array.forEach`).
+```html
+<section class="proof-bar reveal">
+  <div class="wrap proof-bar__inner">
+    <p class="proof-bar__value">17<span class="proof-bar__unit">часов</span></p>
+    <p class="proof-bar__label">покрытия в сутки · офисы в Москве и на Сахалине</p>
+  </div>
+</section>
+```
 
-## 3. TODO перед продом
+### Требование к интеграции — real-value rule (UX-критично)
 
-- [ ] Заменить `XXXXXXXX` → реальный Метрика counter ID (8 цифр,
-      создать на https://metrika.yandex.ru/list) — **2 места** в `index.html`:
-      строка `ym(XXXXXXXX, "init", …)` и `noscript`-fallback URL.
-- [ ] Заменить `G-XXXXXXX` → реальный GA4 measurement ID
-      (создать на https://analytics.google.com) — **2 места** в `index.html`:
-      `<script async src="…?id=G-XXXXXXX">` и `gtag('config', 'G-XXXXXXX')`.
-- [ ] Заменить `YM_COUNTER_ID = 0` в `assets/js/hero.js` на реальный ID.
-- [ ] Заменить `https://t.me/` (secondary CTA) на реальный URL
-      Telegram-бота с опросом.
-- [ ] Создать `<section id="audit-form">` с формой заявки.
-      **Обязательно:** отдельный `<input type="checkbox" required>`
-      с согласием на обработку ПДн (152-ФЗ — нельзя «нажимая кнопку»).
-- [ ] Снять comment-wrapper с Метрики и GA4 в `<head>`, обернуть их
-      в **cookie-consent gate** (загружать `tag.js` / `gtag.js` только
-      после явного согласия пользователя).
-- [ ] **152-ФЗ compliance** (юридически обязательно):
-  - [ ] Страница `/privacy` (Политика обработки ПДн).
-  - [ ] Cookie/data-consent banner **ДО** загрузки Метрики/GA4.
-  - [ ] Checkbox согласия на каждой форме сайта.
-  - [ ] В политике: оператор ПДн = юрлицо + ИНН + ОГРН
-        (ООО «Альфа-Касса» / ООО «Альфа-Трейд» — см. брендбук 2019).
-  - [ ] Email для запросов субъектов ПДн.
-  - [ ] Регистрация в Роскомнадзоре как оператор ПДн.
-- [ ] Проверить актуальность цифр Stat-Strip (200+, 7, 17ч)
-      каждый квартал, обновлять `data-count-to`.
-- [ ] **Заменить «поддержка 24/7» НА ВСЁМ САЙТЕ** на
-      «17 часов покрытия в сутки» — текущая формулировка ложна
-      (юр-риск для РФ-юрлица).
-- [ ] (Опционально) Заменить CSS-chevron между колонками Schema-First
-      на дизайн-SVG, если нужен брендированный вид.
-- [ ] Brand SVGs: сейчас лежат в `public/brand/logo-color.svg` и
-      `logo-mono.svg` (артефакт ранней React-гипотезы). На vanilla-сайте
-      перенести в `assets/img/` или иное стандартное место и обновить
-      пути при интеграции.
+Значение `17` отрисовывается в HTML **напрямую**. Никакого `data-count-to`, никакого JS-анимирования.
 
-## 4. Как тестировать count-up локально
+Если в будущем кто-то захочет добавить count-up:
 
-1. Запустить статик-сервер из корня репо:
-   ```
-   python3 -m http.server 8000
-   # или: npx serve .
-   # или VS Code → Live Server
-   ```
-2. Открыть `http://localhost:8000/`.
-3. Прокрутить до Stat-Strip — три цифры считают `0 → 200+ / 0 → 7 / 0 → 17ч`
-   за ~800 ms (ease-out).
-4. Если не считает — открыть DevTools → Console:
-   - `Uncaught ReferenceError` → проверить путь к `assets/js/hero.js`.
-   - Цифры остаются на `0` → Stat-Strip не вошёл во viewport
-     (threshold 0.3 — должно быть видно ≥30% секции).
+- HTML рендерится с **реальным** значением;
+- JS **поверх** заменяет на `0` и анимирует обратно до реального;
+- НЕ наоборот.
 
-## 5. Как тестировать prefers-reduced-motion
+Это защита от UX-бага: при отказе JS / `prefers-reduced-motion: reduce` / медленном LCP — пользователь видит «17 часов покрытия» сразу, а не «0 часов покрытия» на первом экране. То же правило применить к `.metric` блоку при будущем рефакторинге (см. §3 Roadmap в коммите 3b).
 
-1. Chrome DevTools → `Ctrl+Shift+P` → «Show Rendering».
-2. В нижней панели «Rendering»: «Emulate CSS media feature
-   `prefers-reduced-motion`» → выбрать `reduce`.
-3. Перезагрузить страницу.
-4. Ожидаемое:
-   - Stat-Strip: цифры показывают финальное значение **сразу**,
-     без счёта.
-   - CTA-кнопки: hover не сдвигает стрелку (`.btn__arrow`).
-   - Все CSS `transition` отключены.
-5. Альтернатива в OS: macOS → Settings → Accessibility → Display →
-   Reduce motion. Windows → Settings → Accessibility → Visual effects
-   → Animation effects (off).
+### Доступность
 
-## Bonus: Roadmap (из CLAUDE.md)
+- `.proof-bar` обёрнут в `<section>` — семантический landmark.
+- Контент — текст в `<p>`, никаких иконок и интерактивности → ARIA-атрибуты не нужны.
+- Цифра `17` + единица «часов» в одном `<p>` → программам экранного доступа читается как «семнадцать часов».
 
-1. `.systems` → переверстать в карточки с метриками.
-2. `.faq` → структурировать по категориям (биллинг, интеграции,
-   поддержка и т. п.).
-3. Кейсы — новая секция между `.scheme` и `.systems`.
-4. Performance / LCP optimization — preload Hero-картинки,
-   font-display, critical CSS.
-5. **152-ФЗ compliance** — приоритет №1 (см. чек-лист выше).
-6. `.partners` — почистить логотипы партнёров до качественных SVG
-   (сейчас разнородные растры).
+### Класс `.reveal`
+
+Анимация `slideUp` (0.8s ease forwards, opacity+translateY30) применяется один раз при загрузке. Класс ставится на `<section>`, а не на внутренний контейнер. Site-CSS уже определяет keyframes; `hero.css` v2 добавляет scoped `prefers-reduced-motion` guard для `.reveal*` классов.
+
+### Без `data-event`
+
+На proof-bar нет интерактивных элементов → tracker'у нечего ловить.
+
+---
+
+## 3. Group II — Иконки колонок (3 SVG, line-art lucide-style)
+
+Используются в `.scheme-col__icon` (48×48 wrap) внутри Schema-First секции. Полная сборка секции — в коммите 3b (Group III + вёрстка). Здесь — только сами SVG, как «иконочная библиотека» для копи-паста.
+
+### Общие атрибуты
+
+| Атрибут | Значение | Зачем |
+|---|---|---|
+| `width="24"` `height="24"` | фиксированный размер | защита от CLS при отключённом CSS |
+| `viewBox="0 0 24 24"` | base grid lucide/feather | масштабируется через CSS до 26×26 |
+| `fill="none"` `stroke="currentColor"` | line-art | автоматически наследует `color: var(--accent)` от родителя |
+| `stroke-width="1.75"` | средняя толщина | гармонирует с `.system-card-featured` weight |
+| `stroke-linecap="round"` `stroke-linejoin="round"` | мягкие концы | бренд-стиль |
+| `aria-hidden="true"` `focusable="false"` | декоративность | рядом всегда есть текстовый kicker + title; экранный диктор пропускает |
+
+> Все три — **декоративные** (`aria-hidden`). `<title>` / `role="img"` не нужны.
+
+### II.1 — boxes (колонка «Что у вас?»)
+
+Метафора: гетерогенный набор систем у клиента (3 разных «коробки» — 3 конфигурации 1С).
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <rect x="3" y="3" width="7" height="7" rx="1"/>
+  <rect x="14" y="3" width="7" height="7" rx="1"/>
+  <rect x="9" y="14" width="7" height="7" rx="1"/>
+</svg>
+```
+
+### II.2 — layers (колонка «Что мы добавим?»)
+
+Метафора: стек = слои (платформа + БД + OS).
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M12 2 2 7l10 5 10-5-10-5z"/>
+  <path d="m2 17 10 5 10-5"/>
+  <path d="m2 12 10 5 10-5"/>
+</svg>
+```
+
+### II.3 — shield-check (колонка «Что получите?»)
+
+Метафора: автоматическое соответствие закону = защита от штрафов.
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+  <path d="m9 12 2 2 4-4"/>
+</svg>
+```
+
+---
+
+## 4–9. (TODO — коммит 3b)
+
+В следующем коммите 3b сюда добавляются:
+
+- **§4** — Group III: 10 SVG иконок для нод (factory, store, warehouse, app-window, database, server, wine, paw-print, qr-code, receipt) + a11y-атрибуты + render-size 18×18.
+- **§5** — Schema-First полный HTML snippet (3 колонки + 10 нод + overlay-SVG для connection-lines + финальный CTA + `.reveal-1..5` stagger). 3 нода с `<a href>` (ЕГАИС, Меркурий, Честный знак), 7 нод с `<div>`. Mobile chevron / desktop overlay поведение явно описано.
+- **§6** — Подключения CSS/JS, font-stack, dependency check.
+- **§7** — Архив `_archive/index.v1.frozen.html`, как с ним обращаться.
+- **§8** — JSON-LD на проде: что уже есть (Organization + FAQPage) и почему новой разметки **не добавляем** в Hero. Service[] — в roadmap.
+- **§9** — Roadmap (расширенный): 6 пунктов + 4.5 (WCAG button audit) + 4.6 (`.metrics` defaults + 24/7 removal) + 4.7 (`Service[]` JSON-LD).
+- **§10** — Тестирование (`prefers-reduced-motion`, viewport breakpoints).
