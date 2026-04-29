@@ -6,6 +6,12 @@
    Reveal (@keyframes slideUp + .reveal-1..5) — site idiom; добавляем только
    motion-safe guard, scoped к нашим reveal-классам. */
 
+/* Единственная новая token: цвет glow для connection-lines.
+   Если на сайте появится --btn-primary-shadow-color — наследует автоматически. */
+:root {
+  --scheme-glow: var(--btn-primary-shadow-color, rgba(255, 122, 26, 0.35));
+}
+
 
 /* ===== PROOF-BAR (single-cell, replaces multi-stat strip) =================
    Idiom: site `.brands` divider band — border-top + border-bottom + .wrap.
@@ -92,7 +98,7 @@
   height: 100%;
   pointer-events: none;
   z-index: 0;
-  filter: drop-shadow(0 0 6px rgba(255, 122, 26, 0.35));
+  filter: drop-shadow(0 0 6px var(--scheme-glow));
 }
 
 /* Mobile chevron между парами колонок (вертикально вниз).
