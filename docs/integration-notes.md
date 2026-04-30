@@ -634,7 +634,7 @@ HTML node (некликабельный — посадочной страниц�
 
 ### Заметки по интеграции
 
-- **CTA href:** `#contact` — анкер на существующую секцию `<section class="contact">` сайта (`site_head.txt:1232`). Если у этой секции на проде нет `id="contact"` — добавить или поправить href под фактический id формы.
+- **CTA href:** `#contact` — анкер на существующую секцию `<section class="contact">` в live `<head>` сайта.<sub> исторически — `site_head.txt:1232 @ 4c7db1f`</sub> Если у этой секции на проде нет `id="contact"` — добавить или поправить href под фактический id формы.
 - **Reveal stagger:** `header(reveal)` → `input(reveal-1)` → `stack(reveal-2)` → `integrations(reveal-3)` → `cta(reveal-4)`. Ноды без stagger — наследуют родительский fade колонки.
 - **Mobile / desktop split:** overlay-SVG `.scheme__lines` управляется CSS — `display: none` ниже 1024 px, `display: block` от 1024. Mobile-chevron между колонками — наоборот, виден ≤1023, скрыт ≥1024. Никакого JS.
 - **`data-event`:** 4 точки трекинга — 3 ноды (egais/merkuriy/chestnyy_znak) + финальный CTA. Делегированный tracker в `assets/js/hero.js` ловит автоматически.
@@ -644,7 +644,7 @@ HTML node (некликабельный — посадочной страниц�
 
 ## 6. Подключения CSS/JS
 
-**CSS:** `<link rel="stylesheet" href="assets/css/hero.css">` помещается в `<head>` **после** inline `<style>` сайта. Уже добавлено в `site_head.txt:1635`. Это критично — наш `:root { --scheme-glow: ... }` должен подгружаться позже сайтового `:root`, чтобы fallback-цепочка `var(--btn-primary-shadow-color, rgba(255,122,26,0.35))` работала корректно.
+**CSS:** `<link rel="stylesheet" href="assets/css/hero.css">` помещается в `<head>` **после** inline `<style>` сайта — в самом конце `<head>`, последней строкой перед `</head>`.<sub> исторически — `site_head.txt:1635 @ 4c7db1f`</sub> Это критично — наш `:root { --scheme-glow: ... }` должен подгружаться позже сайтового `:root`, чтобы fallback-цепочка `var(--btn-primary-shadow-color, rgba(255,122,26,0.35))` работала корректно.
 
 **JS:** `<script src="assets/js/hero.js" defer></script>` перед `</body>`. Для proof-bar v2 (статичная цифра) и Schema-First v2 (без count-up) реальной работы не выполняет. Полезен только для делегированного `[data-event]` tracker'а, который автоматически ловит клики на 3 кликабельные ноды (ЕГАИС, Меркурий, Честный знак). Если на проде Метрика/GA4 ещё не подключены — tracker молчит, никаких ошибок.
 
@@ -656,7 +656,7 @@ HTML node (некликабельный — посадочной страниц�
 
 ## 8. JSON-LD на проде
 
-В live `<head>` уже размещены два узла внутри одного `@graph` (см. `site_head.txt:38–145`):
+В live `<head>` уже размещены два узла внутри одного `@graph` (inline `<script type="application/ld+json">` рядом с другими meta-тегами):<sub> исторически — `site_head.txt:38–145 @ 4c7db1f`</sub>
 
 - **Organization** — ООО «Альфа-Касса», ИНН 6506011939, ОГРН 1186501006394, Сахалинская область, телефон, email, `knowsAbout` (15 терминов: ЕГАИС, Честный знак, ГИС МТ, Меркурий, ФГИС ЛК, ФГИС Зерно, ЭДО, цифровой рубль, МЧД, СБП, 1С, АТОЛ, Frontol, маркировка, 54-ФЗ).
 - **FAQPage** — 8 Question/Answer пар.
@@ -705,7 +705,7 @@ HTML node (некликабельный — посадочной страниц�
 
 #### 4.7 — `Service[]` JSON-LD (audit пройден, отдельная задача)
 
-Проверка `site_head.txt` (1635 строк): **сейчас на проде нет** `"@type": "Service"`. Существующий `@graph` содержит только `Organization` (с `knowsAbout`-массивом из 15 терминов) и `FAQPage` (8 Q/A).
+Audit прод-`<head>` (снапшот 1635 строк, выполнен на коммите `4c7db1f`): **на момент проверки на проде нет** `"@type": "Service"`. Существующий `@graph` содержит только `Organization` (с `knowsAbout`-массивом из 15 терминов) и `FAQPage` (8 Q/A).
 
 **Задача:** при развитии посадочных `/tsifrovye-sistemy/{egais,chestnyy-znak,merkuriy,...}` добавить на каждой посадочной свой `Service` узел внутри `@graph`, с `provider: { "@id": "https://gruppa-alfa.ru/#organization" }` (ссылка на главный Organization).
 
@@ -724,6 +724,18 @@ HTML node (некликабельный — посадочной страниц�
 ```
 
 **Не делать на главной** — `Service` без посадочной = висящая ссылка для краулера.
+
+#### 4.8 — Pre-deploy gate: посадочные `/tsifrovye-sistemy/*/` отдают 200
+
+Перед деплоем hero/scheme на прод **обязательно** проверить из браузера или внешнего curl, что 3 кликабельные ноды схемы не ведут в 404:
+
+```bash
+curl -sI https://gruppa-alfa.ru/tsifrovye-sistemy/egais/         | head -1
+curl -sI https://gruppa-alfa.ru/tsifrovye-sistemy/merkuriy/      | head -1
+curl -sI https://gruppa-alfa.ru/tsifrovye-sistemy/chestnyy-znak/ | head -1
+```
+
+Все 3 = `HTTP/* 200` → деплой как есть. Хотя бы один ≠ 200 → перед копипастом §5 деградировать соответствующий `<a href="...">` → `<div>` (без href), кликабельность вернуть отдельным коммитом после готовности страницы. Из dev-окружения Claude Code проверка невозможна (egress proxy блокирует `gruppa-alfa.ru` → 403 host_not_allowed) — гейт исполняется человеком.
 
 ### 152-ФЗ compliance (preserved из v1)
 
