@@ -1,0 +1,262 @@
+/* hero.css — Proof-bar + Schema-First, native to gruppa-alfa.ru design system.
+   Все токены (--ink, --accent, --line, --purple-*, --display, --body, --accent-soft)
+   уже определены в site `:root`. Этот файл их не переопределяет.
+   Container = .wrap (max-width 1320px, padding 0 32px) — site idiom.
+   Buttons (.btn / .btn-primary / .btn-ghost) — site idiom, мы не дублируем.
+   Reveal (@keyframes slideUp + .reveal-1..5) — site idiom; добавляем только
+   motion-safe guard, scoped к нашим reveal-классам. */
+
+/* Единственная новая token: цвет glow для connection-lines.
+   Если на сайте появится --btn-primary-shadow-color — наследует автоматически. */
+:root {
+  --scheme-glow: var(--btn-primary-shadow-color, rgba(255, 122, 26, 0.35));
+}
+
+
+/* ===== PROOF-BAR (single-cell, replaces multi-stat strip) =================
+   Idiom: site `.brands` divider band — border-top + border-bottom + .wrap.
+   ========================================================================= */
+.proof-bar {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.proof-bar__inner {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 24px 0;
+}
+
+.proof-bar__value {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(40px, 6vw, 60px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* «часов» — accent-цвет, 0.55em, 500 weight (idiom site `.metric-num .unit`) */
+.proof-bar__unit {
+  color: var(--accent);
+  font-size: 0.55em;
+  font-weight: 500;
+  margin-left: 6px;
+  letter-spacing: 0;
+}
+
+.proof-bar__label {
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  max-width: 64ch;
+}
+
+@media (max-width: 640px) {
+  .proof-bar__inner { gap: 12px; padding: 20px 0; }
+  .proof-bar__label { width: 100%; }
+}
+
+
+/* ===== SCHEMA-FIRST =======================================================
+   Section idiom — подсветка `.systems`: linear-gradient через purple-brand.
+   ========================================================================= */
+.scheme {
+  padding: 100px 0 60px;
+  position: relative;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(107, 74, 158, 0.08) 50%,
+    transparent 100%);
+}
+
+/* Section header повторяет site `.section-head` / `.section-kicker` / `.section-title`
+   ВАЖНО: используем site-классы напрямую (.section-head, .section-kicker, .section-title),
+   так что собственных правил здесь не пишем — приходят со страницы. */
+
+.scheme__diagram {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-top: 48px;
+}
+
+/* SVG-overlay: декоративные connection-lines, видимы только desktop ≥1024 */
+.scheme__lines {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  filter: drop-shadow(0 0 6px var(--scheme-glow));
+}
+
+/* Mobile chevron между парами колонок (вертикально вниз).
+   На desktop скрывается, появляется SVG-overlay. */
+.scheme-col:not(:last-child)::after {
+  content: '';
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin: 4px auto -4px;
+  border-right: 2px solid var(--purple-light);
+  border-bottom: 2px solid var(--purple-light);
+  transform: rotate(45deg);
+  opacity: 0.45;
+}
+
+/* Column card — клон site `.system-card-featured` */
+.scheme-col {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 28px;
+  transition: all .25s ease;
+}
+.scheme-col:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 122, 26, 0.4);
+  transform: translateY(-3px);
+}
+
+.scheme-col__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+}
+.scheme-col__icon svg { width: 26px; height: 26px; }
+
+/* kicker: повторяет site `.section-kicker` (но scoped) */
+.scheme-col__kicker {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0;
+}
+.scheme-col__kicker::before {
+  content: '◆ ';
+  color: var(--accent);
+}
+
+.scheme-col__title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--ink);
+  margin: 0;
+}
+
+.scheme-col__lede {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-dim);
+  margin: 0 0 4px;
+}
+
+.scheme-col__nodes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Node card — клон site `.system-card-compact`, layout icon-LEFT */
+.scheme-node {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px 14px;
+  transition: all .25s ease;
+}
+.scheme-node:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 122, 26, 0.35);
+  transform: translateY(-1px);
+}
+
+.scheme-node__icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.scheme-node__icon svg { width: 18px; height: 18px; }
+
+.scheme-node__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.scheme-node__term {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.scheme-node__benefit {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink-dim);
+}
+
+@media (min-width: 1024px) {
+  .scheme__diagram { grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .scheme__lines { display: block; }
+  .scheme-col:not(:last-child)::after { display: none; }
+}
+
+.scheme__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 48px;
+}
+
+
+/* ===== Reveal motion-safe guard ===========================================
+   На сайте reveal-* НЕ имеет prefers-reduced-motion guard. Добавляем scoped.
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-1,
+  .reveal-2,
+  .reveal-3,
+  .reveal-4,
+  .reveal-5 {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
