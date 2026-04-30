@@ -769,3 +769,81 @@ curl -sI https://gruppa-alfa.ru/tsifrovye-sistemy/chestnyy-znak/ | head -1
 | ≤640 px | proof-bar: цифра + label вертикально (`flex-wrap: wrap`). |
 | ≤1023 px | Schema: 1 колонка, между парами — chevron вниз. Overlay-SVG скрыт (`display: none`). |
 | ≥1024 px | Schema: 3 колонки, chevron'ы скрыты, overlay-SVG виден (декоративные connection-lines). |
+
+---
+
+## 11. Environment & rollback notes
+
+### Constraint: tag push from Claude Code dev environment
+
+Proxy Claude GitHub App (`http://local_proxy@127.0.0.1:.../`) returns
+HTTP 403 on any push targeting `refs/tags/*`, regardless of refspec form
+(`<tagname>`, `refs/tags/<tagname>`, `--tags`). Branches push fine
+through the same proxy.
+
+**Implication:** annotated tags created inside Claude Code sessions
+cannot be published to origin from that environment. Options:
+
+1. Create tag locally in dev-session for documentation, do not push —
+   accept "tag exists locally only" as known state.
+2. Recreate and push tag from a developer's local machine with direct
+   GitHub access (outside Claude Code).
+3. Skip tags entirely, use commit SHAs as release identifiers (current
+   choice for redesign v2).
+
+Do not waste time trying alternative refspec forms — all tested forms
+return 403.
+
+### Redesign v2 release identifier
+
+Since no `redesign-v2-ready` tag exists on origin, the canonical
+identifier for "redesign v2 ready for prod deploy" state is commit SHA:
+
+```
+450b8c4  chore: drop site CSS snapshot  (HEAD of redesign v2)
+```
+
+Verify before deploy:
+
+```bash
+git rev-parse HEAD
+# Must equal 450b8c4...
+```
+
+### Rollback recipe (if pre-flight fails or prod regression detected)
+
+Pre-redesign state is fixed at commit:
+
+```
+4c7db1f  Add files via upload
+```
+
+Full redesign v2 spans 7 commits, from `72acba3` (Turn 5 start) through
+`450b8c4` (Turn 7 end). To roll back to pre-redesign state:
+
+```bash
+# Hard reset (destructive — only if working tree clean)
+git reset --hard 4c7db1f
+
+# Or revert as new commits (preserves history, safer for shared branches)
+git revert --no-commit 72acba3..450b8c4
+git commit -m "revert: roll back redesign v2 (pre-flight regression)"
+```
+
+For partial rollback (e.g., keep CSS rewrite from Turn 5 but revert
+documentation from Turn 6/7), revert specific commits in reverse order.
+See full commit list in `redesign-v2-ready` tag annotation (local
+only, not on origin).
+
+### Pre-deploy checklist anchor
+
+Active gates before prod deploy (detail in §9 roadmap items 4.1–4.8):
+
+- [ ] Lighthouse mobile: CLS ≤ 0.1, LCP ≤ 2.5s
+- [ ] validator.schema.org: 0 errors on Organization + FAQPage
+- [ ] Yandex.Webmaster: микроразметка валидна, "Просмотр глазами Яндекса"
+      рендерит scheme в SSR
+- [ ] W3C HTML validator on `/`: 0 errors
+- [ ] `curl -I /tsifrovye-sistemy/{egais,merkuriy,chestnyy-znak}/` = 200
+      (gate 4.8, human-executed — Claude Code egress blocks the domain)
+- [ ] Service[] JSON-LD: NOT added until landing pages mature (gate 4.7)
